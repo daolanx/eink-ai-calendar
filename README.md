@@ -8,8 +8,8 @@
 - 显示 AI 根据天气、节日、格言生成的图片。
 - 凌晨自动更新。
 
-<img src="doc/images/s2.jpg"  style="width:61.8%" />
-<img src="doc/images/s12.jpg"  style="width:61.8%" />
+<img src="doc/images/s2.jpg"  style="width:60%" />
+<img src="doc/images/s12.jpg" style="width:60%" />
 
 
 ## 2. 硬件 & 外观

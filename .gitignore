@@ -1,0 +1,4 @@
+.DS_Store
+# Ignore config files in esp32 and server folders
+esp32/config.h
+server/config.py
