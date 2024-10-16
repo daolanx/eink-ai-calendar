@@ -9,12 +9,13 @@
 - 显示 AI 根据天气、节日、格言生成的图片。
 - 凌晨自动更新。
 
-<img src="doc/images/s2.jpg" width="60%" />
-<img src="doc/images/s12.jpg" width="60%" />
+<img src="doc/images/front1.jpg" width="60%" />
+<img src="doc/images/front2.jpg" width="60%" />
+<img src="doc/images/back.jpg" width="60%" /> 
 
 ## 2. 硬件 & 外观
 
-<img src="doc/images/h1.jpg"  />
+<img src="doc/images/modules.jpg"  />
 
 ### 2.1 硬件
 
@@ -31,10 +32,10 @@
 - 外壳 & 背板连接：采用磁吸方式，便于后续充电和调试。磁铁是直径 8mm 厚度 2mm 的圆形磁铁。
 - 3D 打印：一个外框遮罩，用于固定屏幕居中，和遮挡屏幕边缘；8个小盒子，用于放置磁铁，来增大粘合的面积，减少一些过强的吸力。(在 /3d 目录下有源文件)
 
-<img src="doc/images/w1.png" width="40%" />
-<img src="doc/images/w2.png" width="40%" />
-<img src="doc/images/w3.png" width="40%" />
-<img src="doc/images/w4.jpg" width="40%" /> 
+<img src="doc/images/3d-mask.png" width="40%" />
+<img src="doc/images/3d-box.png" width="40%" />
+<img src="doc/images/3d-box2.png" width="40%" />
+<img src="doc/images/back-combo.jpg" width="40%" /> 
 
 ## 3. 软件
 
@@ -54,7 +55,7 @@
 - 图片处理：包括格言文字转图片，节日信息文字转图片，和 AI 图片整个拼接成日历大图，以及后续的颜色抖动算法和数据压缩处理。
 
 可以通过 /show 接口来查看日历效果。
-<img src="doc/images/s3.png" /> 
+<img src="doc/images/screens.png" /> 
 
 实际使用是ESP32 通过请求 /bytes 接口来获取数据。
 
