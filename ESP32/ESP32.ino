@@ -27,7 +27,7 @@ void setup() {
     }
 
     // 初始化并同步网络时间
-    configTime(DAYLIGHT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
+    configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
     Serial.println("Waiting for time sync...");
     delay(3000);  // 给一些时间让时间同步
 
