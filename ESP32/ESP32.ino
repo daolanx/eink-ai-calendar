@@ -8,17 +8,17 @@
 #include "EInk.h"
 #include "time.h"
 
-#define MAX_WIFI_CONNECT_RETRY 20  /* WiFi连接最大重试次数 */
-#define US_TO_S_FACTOR 1000000     /* 微秒到秒的转换因子 */
-#define TIME_TO_SLEEP (60 * 60 * 1) /* ESP32将睡眠的时间（秒） - 1小时 */
+#define MAX_WIFI_CONNECT_RETRY 20  /* Maximum number of WiFi connection retries */
+#define US_TO_S_FACTOR 1000000     /* Conversion factor from microseconds to seconds */
+#define TIME_TO_SLEEP (60 * 60 * 1) /* Time ESP32 will sleep (in seconds) - 1 hour */
 
-#define NTP_SERVER "pool.ntp.org"   /* NTP服务器地址 */
-#define GMT_OFFSET_SEC (8 * 3600)   /* GMT偏移量（秒） - 东八区 */
-#define DAYLIGHT_OFFSET_SEC 0       /* 夏令时偏移量（秒） */
+#define NTP_SERVER "pool.ntp.org"   /* NTP server address */
+#define GMT_OFFSET_SEC (8 * 3600)   /* GMT offset (in seconds) - UTC+8 */
+#define DAYLIGHT_OFFSET_SEC 0       /* Daylight saving time offset (in seconds) */
 
 void setup() {
     Serial.begin(115200);
-    delay(1000);  // 给一些时间让串口准备好
+    delay(1000);  // Give some time for serial to be ready
     Serial.println("ESP32 starting up...");
 
     if (!connectWiFi()) {
@@ -26,12 +26,12 @@ void setup() {
         return;
     }
 
-    // 初始化并同步网络时间
+    // Initialize and sync network time
     configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
     Serial.println("Waiting for time sync...");
-    delay(3000);  // 给一些时间让时间同步
+    delay(3000);  // Give some time for time sync
 
-    // 检查是否在凌晨时段, 或者是否是重启
+    // Check if it's early morning or if it's a restart
     bool isEarly = isEarlyMorning();
     bool isPowerOn = isRestByPowerOn();
     if (isEarly || isPowerOn) {
@@ -41,17 +41,17 @@ void setup() {
         Serial.println("Skip E-Ink update. Reason: Not early morning and not restarted by power on");
     }
 
-    // 设置定时唤醒
+    // Set timer wakeup
     esp_sleep_enable_timer_wakeup((uint64_t)TIME_TO_SLEEP * US_TO_S_FACTOR);
     Serial.println("Setup ESP32 to sleep for " + String(TIME_TO_SLEEP) + " seconds");
     
-    // 进入深度睡眠
+    // Enter deep sleep
     Serial.println("Going to deep sleep now");
     esp_deep_sleep_start();
 }
 
 void loop() {
-    // 深度睡眠模式下，loop 函数不会被执行
+    // Loop function won't be executed in deep sleep mode
 }
 
 bool connectWiFi() {
@@ -82,7 +82,7 @@ bool isEarlyMorning() {
     }
     Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
     Serial.println("Current hour: " + String(timeinfo.tm_hour));
-    // 检查是否在凌晨时段
+    // Check if it's early morning
     bool isEarlyMorning = timeinfo.tm_hour == 0;
     Serial.println("isEarlyMorning: " + String(isEarlyMorning));
     return isEarlyMorning;

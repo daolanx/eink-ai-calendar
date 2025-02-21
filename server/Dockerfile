@@ -1,17 +1,17 @@
-# 使用官方 Python 运行时作为父镜像
+# Use official Python runtime as parent image
 FROM python:3.8-slim
 
-# 设置工作目录
+# Set working directory
 WORKDIR /app
 
-# 将当前目录内容复制到容器的 /app 中
+# Copy current directory contents into /app in container
 COPY . /app
 
-# 安装项目依赖
+# Install project dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 暴露端口 8000（假设您的服务器运行在此端口上）
+# Expose port 8000 (assuming server runs on this port)
 EXPOSE 8000
 
-# 运行应用
+# Run application
 CMD ["python", "app.py"]

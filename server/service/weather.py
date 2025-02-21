@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 @dataclass
 class WeatherInfo(TypedDict):
-    weather: str  # 白天天气状况
-    tempRange: str  # 温度范围
+    weather: str  # Daytime weather conditions
+    tempRange: str  # Temperature range
 
 # get today weather
 def get_weather() -> Optional[WeatherInfo]:

@@ -7,7 +7,7 @@ class MottoInfo(TypedDict):
     origin: Optional[str]
 
 def get_motto() -> MottoInfo:
-    default_motto = MottoInfo(content="沉默是金.", origin=None)
+    default_motto = MottoInfo(content="Silence is golden.", origin=None)
     
     try:
         response = requests.get(motto_api_url, timeout=5)
@@ -24,4 +24,3 @@ def get_motto() -> MottoInfo:
     except Exception as e:
         print(f"Error fetching motto: {e}")
         return default_motto
-

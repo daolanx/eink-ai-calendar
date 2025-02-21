@@ -57,7 +57,7 @@ if __name__ == '__main__':
     logging.info('Starting server...')
     run_server()
 
-    # 打印服务器的 IP 地址
+    # Print server IP address
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     logging.info(f'Server IP address: {ip_address}')

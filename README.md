@@ -1,109 +1,113 @@
 # Eink-AI-Calendar
 
-这是一款基于 ESP32 的电子墨水 AI 日历。只属于当天的不可保存不可变更的图文，和低功耗无开关设计，恰似昨日不可留，今日如新，明日不可知，静默流逝而不觉的时光。
+English | [中文版](README_zh.md)
 
-## 1. 功能
+This is an ESP32-based E-ink AI Calendar. Like time itself - which cannot hold onto yesterday, makes each day new, and keeps tomorrow unknown - it displays daily images and text that cannot be saved or changed, with a low-power, switch-free design.
 
-- 显示日期、天气、节日信息。
-- 显示每日一句格言。
-- 显示 AI 根据天气、节日、格言生成的图片。
-- 凌晨自动更新。
+## 1. Features
+
+- Displays date, weather, and holiday information
+- Shows daily inspirational quotes
+- Displays AI-generated images based on weather, holidays, and quotes
+- Automatically updates at midnight
 
 <img src="doc/images/front1.jpg" width="60%" />
 <img src="doc/images/front2.jpg" width="60%" />
-<img src="doc/images/back.jpg" width="60%" /> 
+<img src="doc/images/back.jpg" width="60%" />
 
-## 2. 硬件 & 外观
+## 2. Hardware & Appearance
 
-<img src="doc/images/modules.jpg"  />
+<img src="doc/images/modules.jpg" />
 
-### 2.1 硬件
+### 2.1 Hardware
 
-采用低功耗的硬件方案：
+Uses low-power hardware components:
 
-- 屏幕：微雪的 5.65 寸 7 色 电子墨水屏 [5.65inch e-Paper Module (F)](https://www.waveshare.net/shop/5.65inch-e-Paper-Module-F.htm)
-- 驱动板：微雪的带电子墨水屏驱动的 ESP32 模块。[e-Paper-ESP32-Driver-Board](https://www.waveshare.net/shop/e-Paper-ESP32-Driver-Board.htm)
-- 电池：中顺芯 5V 恒压锂电池 5000mAh（尺寸根据相框内框大小购买），充电 type-c 母，放电 microUSB 公。
+- Screen: Waveshare 5.65-inch 7-color E-ink display [5.65inch e-Paper Module (F)](https://www.waveshare.net/shop/5.65inch-e-Paper-Module-F.htm)
+- Driver Board: Waveshare ESP32 module with E-ink display driver [e-Paper-ESP32-Driver-Board](https://www.waveshare.net/shop/e-Paper-ESP32-Driver-Board.htm)
+- Battery: ZhongShunXin 5V constant voltage lithium battery 5000mAh (size chosen based on frame interior dimensions), with Type-C female charging port and microUSB male discharge port
 
-### 2.2 外观
+### 2.2 Appearance
 
-- 外壳：某宝购买的 6寸 (10.2 cm * 15.2 cm) 木质相框, 因为内部要放芯片和电池，特地选择厚度达 3cm 的相框。
-- 背板：因为原相框的木质背板比较厚，因此再单独购买 6 寸相册背板。
-- 外壳 & 背板连接：采用磁吸方式，便于后续充电和调试。磁铁是直径 8mm 厚度 2mm 的圆形磁铁。
-- 3D 打印：一个外框遮罩，用于固定屏幕居中，和遮挡屏幕边缘；8个小盒子，用于放置磁铁，来增大粘合的面积，减少一些过强的吸力。(在 /3d 目录下有源文件)
+- Frame: 6-inch (10.2 cm \* 15.2 cm) wooden photo frame from online marketplace, specifically chosen with 3cm thickness to accommodate chips and battery
+- Back Panel: Separate 6-inch photo album back panel (original wooden back panel was too thick)
+- Frame & Back Panel Connection: Magnetic attachment for easy charging and debugging. Uses 8mm diameter, 2mm thick circular magnets
+- 3D Printed Parts: A frame mask to center the screen and cover screen edges; 8 small boxes to house magnets, increasing adhesion area and reducing excessive magnetic force (source files in /3d directory)
 
 <img src="doc/images/3d-mask.png" width="40%" />
 <img src="doc/images/3d-box.png" width="40%" />
 <img src="doc/images/3d-box2.png" width="40%" />
-<img src="doc/images/back-combo.jpg" width="40%" /> 
+<img src="doc/images/back-combo.jpg" width="40%" />
 
-## 3. 软件
+## 3. Software
 
-### 3.1 架构
+### 3.1 Architecture
 
-- C/S 架构：因为 ESP32 算力有限，采用 C/S 架构，ESP32 作为客户端，从 http 接口读取处理好的 byte 数据，显示在电子墨水屏上，来减少 ESP32 的压力。
+- Client/Server Architecture: Due to ESP32's limited computing power, a C/S architecture is used. ESP32 acts as client, reading processed byte data from HTTP endpoints to display on the E-ink screen, reducing ESP32's workload.
 
-### 3.2 客户端
-客户端主要具备更新检测和图片渲染两个功能。
+### 3.2 Client
 
-- 更新时机：
-  - 每日凌晨更新：通过每小时 ESP32 的定时唤醒，唤醒后连接 wifi 获取时间，检查是否到凌晨，如果是凌晨则更新日历信息，来达到每日更新的效果。
-  - 刚电源接通或者按复位键更新：即 esp_reset_reason() 为 ESP_RST_POWERON 也触发更新，便于初始化和调试。
-- 渲染方式：局部刷新的文档太少也没找到相关资料，因此也采用全部刷新的方式，即每次更新都重新绘制整个屏幕，图片和数据处理都在服务端实现。需要注意的是该电子墨水屏刷新时间建议控制在 30s 以上，调试过程避免频繁刷新损坏屏幕。
+The client handles update detection and image rendering.
 
-### 3.3 服务端
-服务端主要是数据聚合和图片处理。
-- 聚合数据：通过聚合数据提供的 API 获取天气、节日信息，以及 AI 生成图片数据。
-- 图片处理：包括格言文字转图片，节日信息文字转图片，和 AI 图片整个拼接成日历大图，以及后续的颜色抖动算法和数据压缩处理。
+- Update Timing:
+  - Daily midnight updates: ESP32 wakes hourly, connects to WiFi for time check, updates calendar if midnight
+  - Updates on power connection or reset: Updates when esp_reset_reason() returns ESP_RST_POWERON, useful for initialization and debugging
+- Rendering Method: Due to limited documentation on partial refresh, full screen refresh is used. All image and data processing happens server-side. Note: Screen refresh interval should be >30s to prevent damage from frequent updates.
 
-可以通过 /show 接口来查看日历效果。
-<img src="doc/images/screens.png" /> 
+### 3.3 Server
 
-实际使用是ESP32 通过请求 /bytes 接口来获取数据。
+The server handles data aggregation and image processing.
 
+- Data Aggregation: Retrieves weather, holiday information, and AI-generated images through APIs
+- Image Processing: Converts quote text and holiday information to images, combines with AI images into calendar layout, applies dithering algorithms and data compression
 
-## 4. 运行
+View calendar preview through the /show endpoint.
+<img src="doc/images/screens.png" />
 
-### 4.1 部署服务端
+ESP32 retrieves data through the /bytes endpoint.
 
-可以采用本地运行 python 代码，或者 docker 部署。
+## 4. Setup
 
-#### 4.1.1 本地部署
+### 4.1 Server Deployment
 
-- 安装 python 3.8 环境，并安装依赖。
-- 将 server/config_demo.py 修改为 config.py，并填入天气、AI、等具体的配置项。
-- 执行 python app.py 启动 web 服务。通过访问 /show， /bytes 接口来确认服务端是否正常。正常情况 show 能展示日历图片，bytes 接口能返回大小为 134KB 的图片数据。
+Choose between local Python deployment or Docker.
 
-#### 4.1.2 使用 docker 部署（以群晖 Docker 为例）
+#### 4.1.1 Local Deployment
 
-- 参考 4.1.1 步骤，调试本地运行正常。
-- 安装 [docker](https://docs.docker.com/desktop/install/mac-install/) 
-- 在 server 目录构建镜像。我使用的是 mac 构建，构建的镜像希望部署在群晖运行，因此使用 [buildx](https://github.com/docker/buildx) 来构建 linux/amd64 系统架构的镜像
+- Install Python 3.8 and dependencies
+- Rename server/config_demo.py to config.py and fill in weather, AI, and other configuration details
+- Run python app.py to start web service. Verify through /show and /bytes endpoints. /show should display calendar image, /bytes should return 134KB image data.
+
+#### 4.1.2 Docker Deployment (Synology Example)
+
+- Debug locally following 4.1.1
+- Install [docker](https://docs.docker.com/desktop/install/mac-install/)
+- Build image in server directory. For Mac building targeting Synology, use [buildx](https://github.com/docker/buildx) for linux/amd64 architecture:
 
 ```bash
-docker buildx build --platform linux/amd64 -t eink-calendar-server:amd64 --load . 
+docker buildx build --platform linux/amd64 -t eink-calendar-server:amd64 --load .
 ```
 
-- 镜像完成后，导出镜像为 tar 包：
+- Export image to tar:
 
 ```bash
 docker save -o eink-calendar-server.tar eink-calendar-server:amd64
 ```
 
-- 群晖安装 docker 套件，导入镜像，创建容器即可。
+- Install Docker package on Synology, import image, create container.
 
-### 4.2 烧录 ESP32
+### 4.2 ESP32 Programming
 
-#### 4.2.1 配置环境及验证
+#### 4.2.1 Environment Setup and Verification
 
-- 参考 [E-Paper_ESP32_Driver_Board](https://www.waveshare.net/wiki/E-Paper_ESP32_Driver_Board) 文档，安装 [Arduino IDE 和 esp32 驱动](https://www.waveshare.net/wiki/%E6%A8%A1%E6%9D%BF:Arduino_ESP32/8266_Offline_Installation)。
-- 运行上面文档提供的官方 demo，通过 WiFi例程 来确认 ESP32 正常运行 WIFI； 通过蓝牙例程 来确认 ESP32 正常运行蓝牙，上传展示图片。
+- Follow [E-Paper_ESP32_Driver_Board](https://www.waveshare.net/wiki/E-Paper_ESP32_Driver_Board) documentation to install [Arduino IDE and ESP32 drivers](https://www.waveshare.net/wiki/Template:Arduino_ESP32/8266_Offline_Installation)
+- Run official demos to verify WiFi and Bluetooth functionality, image display
 
-#### 4.2.2 烧录日历程序
+#### 4.2.2 Calendar Program Upload
 
-将 esp32/config_demo.h 修改为 config.h，并填入 wifi 信息。和上一步服务端的 ip 地址和端口号。然后烧录。
+Rename esp32/config_demo.h to config.h, fill in WiFi details and server IP/port from previous step, then upload.
 
-## 5. 感谢
+## 5. Acknowledgments
 
-- 感谢凉糕的 [《我在数字时代做了一个电子日历，让油画和照片可以被装进去》](https://sspai.com/post/82704)，让我有了做这个日历的想法，其中也包含了 C / S 架构说明和如何进行数据压缩的关键技术。
-- 特别感谢 [Debatrix](https://github.com/Debatrix) 的 [Eink-Calendar](https://github.com/Debatrix/eInkPhotoAlbum) 项目，可以说我的整个项目都是基于此项目，通过 cursor 进行修改简化，借鉴了绝大部分程序设计。
+- Thanks to LiangGao's [article](https://sspai.com/post/82704) for inspiration and key technical insights on C/S architecture and data compression
+- Special thanks to [Debatrix](https://github.com/Debatrix) and their [Eink-Calendar](https://github.com/Debatrix/eInkPhotoAlbum) project, which this project heavily references and simplifies using cursor

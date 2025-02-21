@@ -15,7 +15,7 @@ def get_ai_image(date, weather, motto):
     image = generate_ai_image(date, weather, motto)
     
     if image is None:
-        # 如果AI生成失败，创建一个有趣的默认图像
+        # If AI generation fails, create an interesting default image
         image = create_interesting_default_image(448, 370)
     
     return image
@@ -70,16 +70,16 @@ def generate_ai_image(date, weather, motto):
 
 def get_dominant_color(pil_img):
     if pil_img is None:
-        return (200, 200, 200)  # 默认灰色
+        return (200, 200, 200)  # Default gray color
     img = pil_img.copy()
     img = img.convert("RGBA")
     img = img.resize((5, 5), resample=0)
-    dominant_color = img.getpixel((2, 2))[:3]  # 获取RGB值，忽略Alpha通道
-    # 检查颜色是否接近白色，如果是则返回黑色
-    threshold = 180  # 定义"接近白色"的阈值
+    dominant_color = img.getpixel((2, 2))[:3]  # Get RGB values, ignore Alpha channel
+    # Check if color is close to white, if so return black
+    threshold = 180  # Define threshold for "close to white"
     if all(c > threshold for c in dominant_color):
-        # 如果颜色太接近白色，返回黑色
-        return (0, 0, 0)  # 黑色
+        # If color is too close to white, return black
+        return (0, 0, 0)  # Black
     
     return dominant_color
 
@@ -112,28 +112,28 @@ def get_date_img(dominant_color, date_info):
 def get_motto_img(motto_info):
     max_width = 448 - 150
     max_height = 600 - 370
-    canvas = Image.new('RGB', (max_width, max_height), color=(255, 255, 255))  # 使用白色背景
+    canvas = Image.new('RGB', (max_width, max_height), color=(255, 255, 255))  # Use white background
     fnt = ImageFont.truetype(font_path, 16)
     draw = ImageDraw.Draw(canvas)
 
     content = motto_info['content']
     origin = f"—— {motto_info['origin']}" if motto_info['origin'] else ""
 
-    # 计算实际的行高
-    font_bbox = fnt.getbbox('Ay')  # 使用包含上下延伸的字符来获取更准确的高度
+    # Calculate actual line height
+    font_bbox = fnt.getbbox('Ay')  # Use characters with ascenders/descenders for more accurate height
     line_height = font_bbox[3] - font_bbox[1]
-    line_spacing = int(line_height * 0.4)  # 添加 40% 的行间距
+    line_spacing = int(line_height * 0.4)  # Add 40% line spacing
     total_line_height = line_height + line_spacing
 
-    # 首先按 \n 分割
+    # First split by \n
     content_lines = content.split('\n')
     
-    # 然后对每一行进行标点符号分割
+    # Then split each line by punctuation
     punctuation = r'[，。！？；：、,]'
     final_content_lines = []
     for line in content_lines:
         content_segments = re.split(f'({punctuation})', line)
-        content_segments = [seg for seg in content_segments if seg]  # 移除空字符串
+        content_segments = [seg for seg in content_segments if seg]  # Remove empty strings
 
         current_line = ""
         for segment in content_segments:
@@ -146,35 +146,35 @@ def get_motto_img(motto_info):
         if current_line:
             final_content_lines.append(current_line)
 
-    # 计算文本总高度（包括内容和来源，以及额外的空间）
-    extra_space = total_line_height  # 在内容和来源之间添加一个额外的行高
+    # Calculate total text height (including content and source, plus extra space)
+    extra_space = total_line_height  # Add extra line height between content and source
     total_text_height = (len(final_content_lines) + (1 if origin else 0)) * total_line_height + extra_space - line_spacing
 
-    # 计算起始 y 坐标以使文本垂直居中
+    # Calculate starting y coordinate to vertically center text
     start_y = (max_height - total_text_height) // 2
 
-    # 计算所有行的最大宽度
+    # Calculate maximum width of all lines
     max_line_width = max(draw.textbbox((0, 0), line, font=fnt)[2] for line in final_content_lines)
     if origin:
         max_line_width = max(max_line_width, draw.textbbox((0, 0), origin, font=fnt)[2])
 
-    # 计算整体左边距，使文本块水平居中
+    # Calculate overall left margin to horizontally center text block
     left_margin = (max_width - max_line_width) // 2
 
-    # 绘制内容文本
+    # Draw content text
     for i, line in enumerate(final_content_lines):
         bbox = draw.textbbox((0, 0), line, font=fnt)
         line_width = bbox[2] - bbox[0]
-        x = left_margin + (max_line_width - line_width) // 2  # 使每行文本在文本块内水平居中
+        x = left_margin + (max_line_width - line_width) // 2  # Center each line within text block
         y = start_y + i * total_line_height
         draw.text((x, y), line, font=fnt, fill=(0, 0, 0))
 
-    # 绘制来源（如果有）
+    # Draw source (if exists)
     if origin:
         bbox = draw.textbbox((0, 0), origin, font=fnt)
         line_width = bbox[2] - bbox[0]
-        x = left_margin + max_line_width - line_width  # 靠右对齐，但在文本块内
-        y = start_y + len(final_content_lines) * total_line_height + extra_space  # 添加额外的空间
+        x = left_margin + max_line_width - line_width  # Right align within text block
+        y = start_y + len(final_content_lines) * total_line_height + extra_space  # Add extra space
         draw.text((x, y), origin, font=fnt, fill=(0, 0, 0))
 
     return canvas
@@ -201,7 +201,7 @@ def create_interesting_default_image(width, height):
     image = Image.new('RGB', (width, height), color=(255, 255, 255))
     draw = ImageDraw.Draw(image)
 
-    # 添加一些随机的几何图形
+    # Add some random geometric shapes
     for _ in range(20):
         shape = random.choice(['circle', 'rectangle', 'line'])
         color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -246,7 +246,7 @@ def get_dominant_color(pil_img):
     img = img.resize((5, 5), resample=0)
     dominant_color = img.getpixel((2, 2))
     return dominant_color
-# 600 * 0.618 = 370 黄金比例
+# 600 * 0.618 = 370 Golden ratio
 def image_reshape(img, target_width=448, target_height=370):
     # Calculate the aspect ratio of the original image
     aspect_ratio = img.width / img.height
