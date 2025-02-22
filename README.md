@@ -1,6 +1,6 @@
 # Eink-AI-Calendar
 
-English | [中文版](README_zh.md)
+English | [中文版](README-zh.md)
 
 This is an ESP32-based E-ink AI Calendar. Like time itself - which cannot hold onto yesterday, makes each day new, and keeps tomorrow unknown - it displays daily images and text that cannot be saved or changed, with a low-power, switch-free design.
 
